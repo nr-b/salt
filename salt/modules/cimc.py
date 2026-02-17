@@ -1018,3 +1018,89 @@ def tftp_update_cimc(server=None, path=None):
     ret = __proxy__["cimc.set_config_modify"](dn, inconfig, False)
 
     return ret
+
+
+def upload_external_certificate(certificate=None):
+    """
+    Upload an external HTTPS certificate to the CIMC.
+
+    Args:
+        certificate(str): The PEM-encoded certificate content.
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' cimc.upload_external_certificate "-----BEGIN CERTIFICATE-----..."
+
+    """
+    from xml.sax.saxutils import escape
+
+    if not certificate:
+        raise salt.exceptions.CommandExecutionError(
+            "The certificate must be specified."
+        )
+
+    dn = "sys/cert-mgmt/external-cert-upload"
+
+    inconfig = """<uploadExternalCertificate adminAction="content-cert-upload"
+    certificateContent="{}"
+    dn="sys/cert-mgmt/external-cert-upload"/>""".format(
+        escape(certificate, {'"': "&quot;"})
+    )
+
+    ret = __proxy__["cimc.set_config_modify"](dn, inconfig, False)
+    return ret
+
+
+def upload_external_private_key(key=None):
+    """
+    Upload an external private key to the CIMC.
+
+    Args:
+        key(str): The PEM-encoded private key content.
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' cimc.upload_external_private_key "-----BEGIN RSA PRIVATE KEY-----..."
+
+    """
+    from xml.sax.saxutils import escape
+
+    if not key:
+        raise salt.exceptions.CommandExecutionError(
+            "The key must be specified."
+        )
+
+    dn = "sys/cert-mgmt/external-pvt-key-upload"
+
+    inconfig = """<uploadExternalPrivateKey adminAction="content-cert-upload"
+    certificateContent="{}"
+    dn="sys/cert-mgmt/external-pvt-key-upload"/>""".format(
+        escape(key, {'"': "&quot;"})
+    )
+
+    ret = __proxy__["cimc.set_config_modify"](dn, inconfig, False)
+    return ret
+
+
+def activate_external_certificate():
+    """
+    Activate the uploaded external certificate and private key.
+
+    CLI Example:
+
+    .. code-block:: bash
+
+        salt '*' cimc.activate_external_certificate
+
+    """
+    dn = "sys/cert-mgmt"
+
+    inconfig = """<certificateManagement adminAction="activate-external-cert"
+    dn="sys/cert-mgmt"/>"""
+
+    ret = __proxy__["cimc.set_config_modify"](dn, inconfig, False)
+    return ret
