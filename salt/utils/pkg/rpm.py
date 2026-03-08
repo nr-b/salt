@@ -105,7 +105,7 @@ def resolve_name(name, arch, osarch=None):
     if osarch is None:
         osarch = get_osarch()
 
-    if not check_32(arch, osarch) and arch not in (osarch, "noarch"):
+    if not check_32(arch, osarch) and arch not in (osarch, "noarch") and not (osarch == "x86_64" and arch == "x86_64_v2"):
         name += f".{arch}"
     return name
 
